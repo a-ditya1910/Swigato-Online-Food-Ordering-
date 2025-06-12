@@ -1,0 +1,9 @@
+node_modules/
+*.log
+*.DS_Store
+.env
+dotenv
+package-log.json
+build
+build/*
+.git
