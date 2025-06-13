@@ -34,12 +34,12 @@ const Cart = () => {
             <div key={item._id} className="my-2">
               <div className="grid grid-cols-2 md:grid-cols-[1fr_1.5fr_1fr_1fr_1fr_0.5fr] items-center gap-2 text-black text-sm md:text-base">
                 <img
-                  src={`${url}/images/${item.image}`}
+                  src={item.image}
                   alt={item.name}
                   className="w-[50px] rounded"
                 />
                 <p>{item.name}</p>
-                <p className="hidden md:block">${item.price}</p>
+                <p className="hidden md:block">₹{item.price}</p>
                 <p className="hidden md:block">{cartItems[item._id]}</p>
                 <p className="hidden md:block">
                   ₹{item.price * cartItems[item._id]}
@@ -70,7 +70,7 @@ const Cart = () => {
           <div className="text-gray-700 space-y-3 bg-gray-50 p-4 rounded-lg shadow-sm">
             <div className="flex justify-between">
               <p>Subtotal</p>
-              <p>₹{getTotalCartAmount()}</p>
+              <p>₹{isNaN(getTotalCartAmount()) ? 0 : getTotalCartAmount()}</p>
             </div>
             <hr />
             <div className="flex justify-between">

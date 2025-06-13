@@ -8,7 +8,7 @@ const Verify = () => {
   const success = searchParams.get("success"); // Payment success (true/false)
   const orderId = searchParams.get("orderId"); // Order ID from Razorpay
 
-  const { url } = useContext(StoreContext); // URL for your backend
+  const { url, clearCart } = useContext(StoreContext); // URL for your backend and clearCart function
   const navigate = useNavigate();
 
   // Function to verify the payment status with backend
@@ -19,8 +19,11 @@ const Verify = () => {
         orderId,
       });
 
-      // If payment is successful, navigate to 'myorders' page
       if (response.data.success) {
+        // Clear the cart immediately after successful payment
+        clearCart(); // This will clear the cart in your frontend state
+
+        // Redirect to 'myorders' page or success page
         navigate("/myorders");
       } else {
         // If payment fails, redirect to home or any other page
@@ -41,10 +44,11 @@ const Verify = () => {
 
   return (
     <div className="verify">
-      <div className="spinner"></div>
+      <div className="spinner">Verifying Payment...</div>
     </div>
   );
 };
 
 export default Verify;
+
 

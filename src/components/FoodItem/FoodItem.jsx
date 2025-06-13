@@ -3,7 +3,8 @@ import { assets } from "../../assets/assets";
 import { StoreContext } from "../../context/StoreContext";
 
 const FoodItem = ({ id, name, price, description, image }) => {
-  const { cartItems, addToCart, removeFromCart, url } = useContext(StoreContext);
+  const { cartItems, addToCart, removeFromCart} = useContext(StoreContext);
+  const quantity = cartItems[id] || 0;
 
   return (
     <div className="w-full rounded-[15px] bg-[#f5f5f5] shadow-md transition-all duration-300">
@@ -11,28 +12,9 @@ const FoodItem = ({ id, name, price, description, image }) => {
       <div className="relative">
         <img
           className="w-full h-75 object-cover rounded-t-[15px]"
-          src={`${url}/images/${image}`}
+          src={image} // Directly use the image URL from Cloudinary
           alt={name}
         />
-        {!cartItems[id] ? (
-          <></>
-        ) : (
-          <div className="absolute bottom-[15px] right-[15px] flex items-center gap-2 p-1.5 rounded-full bg-white">
-            <img
-              className="w-[30px] cursor-pointer"
-              onClick={() => removeFromCart(id)}
-              src={assets.remove_icon_red}
-              alt="Remove"
-            />
-            <p>{cartItems[id]}</p>
-            <img
-              className="w-[30px] cursor-pointer"
-              onClick={() => addToCart(id)}
-              src={assets.add_icon_green}
-              alt="Add"
-            />
-          </div>
-        )}
       </div>
 
       {/* Content */}
@@ -48,15 +30,33 @@ const FoodItem = ({ id, name, price, description, image }) => {
         {/* Description */}
         <p className="text-sm text-gray-600">{description}</p>
 
-        {/* Price & Add */}
+        {/* Price & Add/Remove */}
         <div className="flex items-center justify-between">
           <span className="text-2xl font-bold text-black">₹{price}</span>
-          <button
-            onClick={() => addToCart(id)}
-            className="py-2 px-4 border border-[#a40404] text-[#a40404] hover:bg-[#a40404] hover:text-white rounded-md transition"
-          >
-            Add to cart
-          </button>
+          {quantity === 0 ? (
+            <button
+              onClick={() => addToCart(id)}
+              className="py-2 px-4 border border-[#a40404] text-[#a40404] hover:bg-[#a40404] hover:text-white rounded-md transition"
+            >
+              Add to cart
+            </button>
+          ) : (
+            <div className="flex items-center gap-3 border border-gray-300 px-3 py-1 rounded-full bg-white shadow-sm">
+              <button
+                onClick={() => removeFromCart(id)}
+                className="text-lg text-[#a40404] font-bold px-2 hover:text-red-600"
+              >
+                -
+              </button>
+              <span className="font-semibold">{quantity}</span>
+              <button
+                onClick={() => addToCart(id)}
+                className="text-lg text-[#0a9c3e] font-bold px-2 hover:text-green-600"
+              >
+                +
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

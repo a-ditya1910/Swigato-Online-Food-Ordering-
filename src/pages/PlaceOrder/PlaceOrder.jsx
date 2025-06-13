@@ -75,8 +75,10 @@ const PlaceOrder = () => {
           color: "#F37254",
         },
       };
+      
 
       const rzp = new window.Razorpay(options);
+      
       rzp.on("payment.failed", function () {
         // Redirect with success=false
         navigate(`/verify?success=false&orderId=${orderDBId}`);

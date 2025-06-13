@@ -1,80 +1,95 @@
+const { uploadImageToCloudinary } = require("../utils/uploadImage");
 const foodModel = require("../models/foodModel");
-const fs = require("fs");
 
 const addFood = async (req, res) => {
-  let image_filename = `${req.file.filename}`;
+  try {
+    const { name, description, price, category } = req.body;
 
-  const food = new foodModel({
-    name: req.body.name,
-    description: req.body.description,
-    price: req.body.price,
-    category: req.body.category,
-    image: image_filename,
-  });
+    if (!req.files || !req.files.image) {
+      return res.status(400).json({
+        success: false,
+        message: "Image file is required",
+      });
+    }
 
-  try{
-    await food.save();
-    res.json({
-      success: true,
-      message: "Food Added",
+    const image = req.files.image;
+
+    const uploadedImage = await uploadImageToCloudinary(
+      image,
+      process.env.FOLDER_NAME || "food_images"
+    );
+
+    const foodItem = await foodModel.create({
+      name,
+      description,
+      price,
+      category,
+      image: uploadedImage.secure_url,
+      imagePublicId: uploadedImage.public_id, // 👈 add this
     });
-  } 
-  catch(error){
-    console.log(error);
-    res.json({
+
+    res.status(200).json({
+      success: true,
+      message: "Food item added successfully",
+      data: foodItem,
+    });
+  } catch (err) {
+    res.status(500).json({
       success: false,
-      message: "Error",
-      error: error,
+      message: "Internal server error",
+      error: err.message,
     });
   }
 };
+
 
 
 const listFood = async (req, res) => {
-  try{
+  try {
     const foods = await foodModel.find({});
-    res.json({
-      success: true,
-      data: foods,
-    });
-  } 
-  catch (error) {
-    console.log(error);
-    res.json({
-      success: false,
-      message: "Error",
-    });
+    res.json({ success: true, data: foods });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Fetch error", error });
   }
 };
 
-
-
 const removeFood = async (req, res) => {
-  try{
-    const food = await foodModel.findById(req.body.id);
+  try {
+    console.log("Received request to remove food with ID:", req.body.id);
 
-    fs.unlink(`uploads/${food.image}`, () => {});
+    const food = await foodModel.findById(req.body.id);
+    if (!food) {
+      console.log("Food not found");
+      return res.status(404).json({ success: false, message: "Food not found" });
+    }
+
+    console.log("Found food:", food);
+
+    // Only try to delete from Cloudinary if imagePublicId exists
+    if (food.imagePublicId) {
+      const result = await cloudinary.uploader.destroy(food.imagePublicId);
+      console.log("Cloudinary destroy result:", result);
+    } else {
+      console.warn("imagePublicId not found. Skipping Cloudinary deletion.");
+    }
 
     await foodModel.findByIdAndDelete(req.body.id);
 
-    res.json({
-      success: true,
-      message: "Food Removed",
-    });
-  } 
-  catch(error){
-    console.log(error);
-    res.json({
+    res.json({ success: true, message: "Food removed successfully" });
+  } catch (error) {
+    console.error("Error in removeFood:", error);
+    res.status(500).json({
       success: false,
-      message: "Error",
+      message: "Failed to remove food",
+      error: error.message,
     });
   }
 };
 
+
 const searchFood = async (req, res) => {
   const { query } = req.query;
-
-  if (typeof query !== "string") {
+  if (!query || typeof query !== "string") {
     return res.status(400).json({ error: "Invalid query" });
   }
 
@@ -87,11 +102,9 @@ const searchFood = async (req, res) => {
     });
 
     res.status(200).json({ data: foods });
-  } 
-  catch (error) {
+  } catch (error) {
     res.status(500).json({ error: "Internal server error" });
   }
 };
 
-
-module.exports = { addFood, listFood, removeFood,searchFood };
+module.exports = { addFood, listFood, removeFood, searchFood };
