@@ -3,8 +3,8 @@ import headerHero from "../../assets/headerHero.jpeg"; // Adjust path if needed
 
 const Header = () => {
   return (
-    <div className="relative w-full bg-[#feffcb] flex items-center px-4 sm:px-6 lg:px-8 mb-12 mt-20">
-      <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between w-full gap-10">
+    <div className="relative w-full bg-[#feffcb] flex items-center px-4 sm:px-8 lg:px-16 mb-8 mt-16 py-10 lg:py-20">
+      <div className="max-w-[1400px] mx-auto flex flex-col lg:flex-row items-center justify-between w-full gap-12">
         {/* Left Text Content */}
         <div className="w-full lg:w-1/2 text-center lg:text-left px-2">
           <h1 className="capitalize text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight text-balance">
@@ -38,7 +38,7 @@ const Header = () => {
         {/* Right Image */}
         <div className="w-full lg:w-1/2 flex justify-center lg:justify-end">
           <img
-            className="w-[90%] sm:w-[95%] md:w-[100%] lg:w-[115%] max-h-[500px] object-contain"
+            className="w-full max-w-[600px] max-h-[550px] object-contain"
             src={headerHero}
             alt="Delivery Boy"
           />
